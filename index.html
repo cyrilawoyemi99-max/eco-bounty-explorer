@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Field Log — Ecological Bounties on Owockibot</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,400;0,500;0,600;1,400&family=Work+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500&display=swap');
+
+  :root{
+    --ink: #EDE7D3;
+    --ink-dim: #B9B39D;
+    --bg: #182620;
+    --bg-raised: #1F3128;
+    --line: #33473C;
+    --moss: #8CA383;       /* completed */
+    --clay: #C97A56;       /* open */
+    --river: #6FA6A0;      /* links / accent */
+    --amber: #D9B36C;      /* reward figures */
+  }
+
+  *{ box-sizing: border-box; }
+
+  body{
+    margin:0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: 'Work Sans', sans-serif;
+    line-height: 1.5;
+  }
+
+  a{ color: var(--river); text-decoration: none; }
+  a:hover{ text-decoration: underline; }
+  a:focus-visible, button:focus-visible, input:focus-visible{
+    outline: 2px solid var(--river);
+    outline-offset: 2px;
+  }
+
+  .wrap{
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 2.5rem 1.25rem 5rem;
+  }
+
+  header.masthead{
+    border-bottom: 1px solid var(--line);
+    padding-bottom: 1.75rem;
+    margin-bottom: 2rem;
+  }
+
+  h1{
+    font-family: 'Spectral', serif;
+    font-weight: 600;
+    font-size: 2rem;
+    line-height: 1.15;
+    margin: 0 0 0.5rem;
+    max-width: 22ch;
+  }
+
+  .standfirst{
+    color: var(--ink-dim);
+    max-width: 46ch;
+    font-size: 1rem;
+    margin: 0 0 1.5rem;
+  }
+
+  .stats{
+    display: flex;
+    gap: 2rem;
+    flex-wrap: wrap;
+  }
+  .stat .n{
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 1.4rem;
+    color: var(--amber);
+    display:block;
+  }
+  .stat .l{
+    font-size: 0.8rem;
+    color: var(--ink-dim);
+  }
+
+  .controls{
+    display: flex;
+    gap: 0.75rem;
+    margin: 2rem 0 0.5rem;
+    flex-wrap: wrap;
+  }
+
+  input[type="search"]{
+    flex: 1;
+    min-width: 180px;
+    background: var(--bg-raised);
+    border: 1px solid var(--line);
+    color: var(--ink);
+    padding: 0.6rem 0.8rem;
+    border-radius: 3px;
+    font-family: 'Work Sans', sans-serif;
+    font-size: 0.95rem;
+  }
+  input[type="search"]::placeholder{ color: var(--ink-dim); }
+
+  button.refresh{
+    background: transparent;
+    border: 1px solid var(--line);
+    color: var(--ink);
+    padding: 0.6rem 1rem;
+    border-radius: 3px;
+    font-family: 'Work Sans', sans-serif;
+    font-size: 0.9rem;
+    cursor: pointer;
+  }
+  button.refresh:hover{ border-color: var(--river); color: var(--river); }
+
+  section.log{ margin-top: 2rem; }
+
+  h2.section-title{
+    font-family: 'Spectral', serif;
+    font-style: italic;
+    font-weight: 400;
+    font-size: 1.1rem;
+    color: var(--ink);
+    margin: 2.5rem 0 0.25rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--line);
+  }
+  .section-sub{
+    color: var(--ink-dim);
+    font-size: 0.85rem;
+    margin: 0 0 1rem;
+  }
+
+  .entry{
+    padding: 1.1rem 0;
+    border-bottom: 1px solid var(--line);
+    display: flex;
+    gap: 1rem;
+    justify-content: space-between;
+    align-items: flex-start;
+  }
+  .entry:last-child{ border-bottom: none; }
+
+  .entry-main{ flex: 1; min-width: 0; }
+
+  .entry-title{
+    font-weight: 500;
+    font-size: 1rem;
+    margin: 0 0 0.3rem;
+  }
+  .entry-title a{ color: var(--ink); }
+  .entry-title a:hover{ color: var(--river); }
+
+  .entry-desc{
+    color: var(--ink-dim);
+    font-size: 0.88rem;
+    margin: 0 0 0.5rem;
+    max-width: 60ch;
+  }
+
+  .tags{
+    display: flex;
+    gap: 0.4rem;
+    flex-wrap: wrap;
+  }
+  .tag{
+    font-size: 0.72rem;
+    color: var(--ink-dim);
+    border: 1px solid var(--line);
+    padding: 0.1rem 0.5rem;
+    border-radius: 20px;
+  }
+
+  .proof-link{
+    font-size: 0.85rem;
+    margin-top: 0.4rem;
+  }
+
+  .entry-meta{
+    text-align: right;
+    flex-shrink: 0;
+    min-width: 90px;
+  }
+
+  .reward{
+    font-family: 'IBM Plex Mono', monospace;
+    color: var(--amber);
+    font-size: 1rem;
+    display: block;
+    margin-bottom: 0.35rem;
+  }
+
+  .status{
+    font-size: 0.72rem;
+    padding: 0.15rem 0.5rem;
+    border-radius: 20px;
+    display: inline-block;
+  }
+  .status.open{ color: var(--clay); border: 1px solid var(--clay); }
+  .status.completed{ color: var(--moss); border: 1px solid var(--moss); }
+
+  .empty, .loading, .error{
+    color: var(--ink-dim);
+    font-size: 0.9rem;
+    padding: 1.5rem 0;
+  }
+  .error{
+    color: var(--clay);
+    border: 1px solid var(--line);
+    background: var(--bg-raised);
+    padding: 1rem 1.1rem;
+    border-radius: 3px;
+    line-height: 1.6;
+  }
+  .error code{
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.8rem;
+    background: var(--bg);
+    padding: 0.1rem 0.35rem;
+    border-radius: 3px;
+  }
+
+  footer{
+    margin-top: 3rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--line);
+    color: var(--ink-dim);
+    font-size: 0.8rem;
+  }
+
+  @media (max-width: 520px){
+    .entry{ flex-direction: column; }
+    .entry-meta{ text-align: left; }
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    *{ animation: none !important; transition: none !important; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="masthead">
+    <h1>Ecological bounties, tracked like field notes</h1>
+    <p class="standfirst">A running log of what's open, what's been built, and where the next ecological contribution on Owockibot might come from.</p>
+    <div class="stats">
+      <div class="stat"><span class="n" id="stat-open">–</span><span class="l">open now</span></div>
+      <div class="stat"><span class="n" id="stat-done">–</span><span class="l">completed</span></div>
+      <div class="stat"><span class="n" id="stat-value">–</span><span class="l">open value (USDC)</span></div>
+    </div>
+  </header>
+
+  <div class="controls">
+    <input type="search" id="filter" placeholder="Filter by keyword — watershed, forest, wildlife…" aria-label="Filter bounties by keyword" />
+    <button class="refresh" id="refresh">Refresh</button>
+  </div>
+
+  <section class="log" id="log">
+    <div class="loading">Fetching the current board…</div>
+  </section>
+
+  <footer>
+    Reads live from <code>owockibot.xyz/api/bounty-board</code>, filtered client-side for ecological, environmental, and bioregional work. Built by
+    <a href="https://github.com/cyrilawoyemi99-max" target="_blank" rel="noopener">cyrilawoyemi99-max</a>.
+  </footer>
+
+</div>
+
+<script>
+  const API_BASE = "https://owockibot.xyz/api/bounty-board";
+
+  // Keywords that mark a bounty as "ecological" — checked against tags first,
+  // then title/description as a fallback if a bounty carries no tags.
+  const ECO_KEYWORDS = [
+    "eco", "ecolog", "environment", "conservation", "climate", "biodivers",
+    "bioregion", "watershed", "forest", "wildlife", "river", "sustainab",
+    "regen", "carbon", "soil", "agroforest", "wetland", "reforest", "habitat"
+  ];
+
+  const logEl = document.getElementById("log");
+  const filterEl = document.getElementById("filter");
+  const refreshBtn = document.getElementById("refresh");
+
+  let allBounties = [];
+
+  function isEcological(b){
+    const haystacks = [];
+    if (Array.isArray(b.tags)) haystacks.push(b.tags.join(" "));
+    if (typeof b.category === "string") haystacks.push(b.category);
+    haystacks.push(b.title || "", b.description || "");
+    const text = haystacks.join(" ").toLowerCase();
+    return ECO_KEYWORDS.some(k => text.includes(k));
+  }
+
+  function isCompleted(b){
+    const s = (b.status || "").toString().toLowerCase();
+    return ["completed", "closed", "done", "paid", "fulfilled"].includes(s);
+  }
+
+  function isOpen(b){
+    const s = (b.status || "").toString().toLowerCase();
+    return ["open", "active"].includes(s) || s === "";
+  }
+
+  // Normalizes whatever shape the API returns into a flat array of bounty objects.
+  function extractBounties(payload){
+    if (Array.isArray(payload)) return payload;
+    if (Array.isArray(payload.bounties)) return payload.bounties;
+    if (Array.isArray(payload.data)) return payload.data;
+    if (Array.isArray(payload.results)) return payload.results;
+    if (Array.isArray(payload.items)) return payload.items;
+    return [];
+  }
+
+  function fieldOf(b, keys, fallback){
+    for (const k of keys){
+      if (b[k] !== undefined && b[k] !== null && b[k] !== "") return b[k];
+    }
+    return fallback;
+  }
+
+  function renderEntry(b){
+    const title = fieldOf(b, ["title", "name"], "Untitled bounty");
+    const desc = fieldOf(b, ["description", "summary", "brief"], "");
+    const reward = fieldOf(b, ["reward", "amount", "payout", "price"], null);
+    const link = fieldOf(b, ["url", "link", "github_url", "issue_url"], null);
+    const proof = fieldOf(b, ["proof_url", "submission_url", "proofUrl"], null);
+    const tags = Array.isArray(b.tags) ? b.tags : [];
+    const completed = isCompleted(b);
+
+    const div = document.createElement("div");
+    div.className = "entry";
+
+    const main = document.createElement("div");
+    main.className = "entry-main";
+
+    const titleEl = document.createElement("p");
+    titleEl.className = "entry-title";
+    if (link){
+      const a = document.createElement("a");
+      a.href = link; a.target = "_blank"; a.rel = "noopener";
+      a.textContent = title;
+      titleEl.appendChild(a);
+    } else {
+      titleEl.textContent = title;
+    }
+    main.appendChild(titleEl);
+
+    if (desc){
+      const descEl = document.createElement("p");
+      descEl.className = "entry-desc";
+      descEl.textContent = desc.length > 160 ? desc.slice(0, 157) + "…" : desc;
+      main.appendChild(descEl);
+    }
+
+    if (tags.length){
+      const tagWrap = document.createElement("div");
+      tagWrap.className = "tags";
+      tags.slice(0, 5).forEach(t => {
+        const s = document.createElement("span");
+        s.className = "tag";
+        s.textContent = t;
+        tagWrap.appendChild(s);
+      });
+      main.appendChild(tagWrap);
+    }
+
+    if (completed && proof){
+      const proofEl = document.createElement("p");
+      proofEl.className = "proof-link";
+      const a = document.createElement("a");
+      a.href = proof; a.target = "_blank"; a.rel = "noopener";
+      a.textContent = "See what was built →";
+      proofEl.appendChild(a);
+      main.appendChild(proofEl);
+    }
+
+    const meta = document.createElement("div");
+    meta.className = "entry-meta";
+    if (reward !== null){
+      const r = document.createElement("span");
+      r.className = "reward";
+      r.textContent = typeof reward === "number" ? `$${reward}` : reward;
+      meta.appendChild(r);
+    }
+    const statusEl = document.createElement("span");
+    statusEl.className = "status " + (completed ? "completed" : "open");
+    statusEl.textContent = completed ? "completed" : "open";
+    meta.appendChild(statusEl);
+
+    div.appendChild(main);
+    div.appendChild(meta);
+    return div;
+  }
+
+  function renderSection(container, title, sub, items){
+    if (!items.length) return;
+    const h = document.createElement("h2");
+    h.className = "section-title";
+    h.textContent = title;
+    container.appendChild(h);
+
+    if (sub){
+      const p = document.createElement("p");
+      p.className = "section-sub";
+      p.textContent = sub;
+      container.appendChild(p);
+    }
+
+    items.forEach(b => container.appendChild(renderEntry(b)));
+  }
+
+  function render(){
+    const query = filterEl.value.trim().toLowerCase();
+    let eco = allBounties.filter(isEcological);
+
+    if (query){
+      eco = eco.filter(b => {
+        const text = [b.title, b.description, (b.tags || []).join(" ")].join(" ").toLowerCase();
+        return text.includes(query);
+      });
+    }
+
+    const open = eco.filter(isOpen).sort((a, b) => (fieldOf(b, ["reward","amount"],0)) - (fieldOf(a, ["reward","amount"],0)));
+    const completed = eco.filter(isCompleted);
+
+    document.getElementById("stat-open").textContent = open.length;
+    document.getElementById("stat-done").textContent = completed.length;
+    const totalValue = open.reduce((sum, b) => {
+      const r = fieldOf(b, ["reward", "amount", "payout"], 0);
+      const n = typeof r === "number" ? r : parseFloat(r) || 0;
+      return sum + n;
+    }, 0);
+    document.getElementById("stat-value").textContent = totalValue ? `$${totalValue.toFixed(0)}` : "–";
+
+    logEl.innerHTML = "";
+
+    if (!eco.length){
+      const p = document.createElement("p");
+      p.className = "empty";
+      p.textContent = query
+        ? "No ecological bounties match that filter."
+        : "No ecological or environmental bounties found on the board right now — check back soon.";
+      logEl.appendChild(p);
+      return;
+    }
+
+    renderSection(logEl, "Open opportunities", "Ecological bounties you can claim right now, highest reward first.", open);
+    renderSection(logEl, "Already built", "Completed ecological bounties — see what past contributors shipped.", completed);
+  }
+
+  async function load(){
+    logEl.innerHTML = '<div class="loading">Fetching the current board…</div>';
+    try {
+      const res = await fetch(API_BASE, { headers: { "Accept": "application/json" } });
+      if (!res.ok) throw new Error(`Server responded ${res.status}`);
+      const payload = await res.json();
+      allBounties = extractBounties(payload);
+      if (!allBounties.length){
+        console.warn("Bounty board response did not match expected shape:", payload);
+      }
+      render();
+    } catch (err) {
+      console.error("Failed to load bounty board:", err);
+      logEl.innerHTML = `
+        <div class="error">
+          Couldn't load live data from <code>${API_BASE}</code>.<br/>
+          This is usually either a CORS restriction (the API doesn't allow browser requests from this domain) or the response shape changed.
+          Open the browser console for details — the raw response, if any, is logged there.
+        </div>`;
+    }
+  }
+
+  filterEl.addEventListener("input", render);
+  refreshBtn.addEventListener("click", load);
+
+  load();
+</script>
+</body>
+</html>
